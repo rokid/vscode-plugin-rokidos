@@ -1,0 +1,73 @@
+{
+  "name": "vscode-plugin-rokidos",
+  "displayName": "vscode-plugin-rokidos",
+  "description": "",
+  "version": "0.0.1",
+  "publisher": "rokid",
+  "engines": {
+    "vscode": "^1.20.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onCommand:rokid.rfs.login",
+    "onCommand:rokid.rfs.setDefaultSkill",
+    "onCommand:rokid.rfs.testIntents",
+    "onCommand:rokid.rfs.getSkillByAppId",
+    "onCommand:rokid.rfs.uploadIntents",
+    "onCommand:rokid.rfs.sayHello"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rokid.rfs.login",
+        "title": "Login",
+        "category": "Rokid"
+      },
+      {
+        "command": "rokid.rfs.setDefaultSkill",
+        "title": "Set Default Skill",
+        "category": "Rokid"
+      },
+      {
+        "command": "rokid.rfs.testIntents",
+        "title": "Test Intents",
+        "category": "Rokid"
+      },
+      {
+        "command": "rokid.rfs.getSkillByAppId",
+        "title": "Skill By App ID",
+        "category": "Rokid"
+      },
+      {
+        "command": "rokid.rfs.uploadIntents",
+        "title": "Upload Intents",
+        "category": "Rokid"
+      },
+      {
+        "command": "rokid.rfs.sayHello",
+        "title": "Hello World",
+        "category": "Rokid"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^2.6.1",
+    "vscode": "^1.1.6",
+    "tslint": "^5.8.0",
+    "@types/node": "^7.0.43",
+    "@types/mocha": "^2.2.42"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "ora": "^2.0.0",
+    "tern": "^0.21.0"
+  }
+}
