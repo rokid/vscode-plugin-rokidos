@@ -1,6 +1,6 @@
 {
   "name": "vscode-plugin-rokidos",
-  "displayName": "vscode-plugin-rokidos",
+  "displayName": "RokidOS Plugin",
   "description": "",
   "version": "0.0.1",
   "publisher": "rokid",
@@ -9,45 +9,45 @@
   },
   "categories": ["Other"],
   "activationEvents": [
-    "onCommand:rokid.rfs.login",
-    "onCommand:rokid.rfs.setDefaultSkill",
-    "onCommand:rokid.rfs.testIntents",
-    "onCommand:rokid.rfs.getSkillByAppId",
-    "onCommand:rokid.rfs.uploadIntents",
-    "onCommand:rokid.rfs.sayHello"
+    "onCommand:rokid.rfs.agent.login",
+    "onCommand:rokid.rfs.agent.setDefaultSkill",
+    "onCommand:rokid.rfs.agent.getSkillByAppId",
+    "onCommand:rokid.rfs.agent.uploadIntents",
+    "onCommand:rokid.rfs.debug.testIntents",
+    "onCommand:rokid.rfs.debug.testNlp"
   ],
   "main": "./out/extension",
   "contributes": {
     "commands": [
       {
-        "command": "rokid.rfs.login",
+        "command": "rokid.rfs.agent.login",
         "title": "Login",
         "category": "Rokid"
       },
       {
-        "command": "rokid.rfs.setDefaultSkill",
+        "command": "rokid.rfs.agent.setDefaultSkill",
         "title": "Set Default Skill",
         "category": "Rokid"
       },
       {
-        "command": "rokid.rfs.testIntents",
-        "title": "Test Intents",
+        "command": "rokid.rfs.agent.getSkillByAppId",
+        "title": "Get Skill By App ID",
         "category": "Rokid"
       },
       {
-        "command": "rokid.rfs.getSkillByAppId",
-        "title": "Skill By App ID",
-        "category": "Rokid"
-      },
-      {
-        "command": "rokid.rfs.uploadIntents",
+        "command": "rokid.rfs.agent.uploadIntents",
         "title": "Upload Intents",
         "category": "Rokid"
       },
       {
-        "command": "rokid.rfs.sayHello",
-        "title": "Hello World",
-        "category": "Rokid"
+        "command": "rokid.rfs.debug.testIntents",
+        "title": "Test Intents",
+        "category": "Rokid Debug"
+      },
+      {
+        "command": "rokid.rfs.debug.testNlp",
+        "title": "Test NLP",
+        "category": "Rokid Debug"
       }
     ]
   },
@@ -67,6 +67,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "cookie": "^0.3.1",
     "ora": "^2.0.0",
     "tern": "^0.21.0"
   }

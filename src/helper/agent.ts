@@ -1,48 +1,27 @@
 "use strict";
 
 import axios, { AxiosInstance, AxiosResponse } from "axios";
+import { ConfigStore } from "./configStore";
 
-const fs = require("fs");
 const ora = require("ora");
 const crypto = require("crypto");
-const path = require("path");
 
 export class Agent {
-  _configPath: string;
-  _configFile: string;
   _config: any;
   $skillHttp: AxiosInstance;
   $rfsHttp: AxiosInstance;
-  public constructor(configFile: string) {
-    this._configPath = path.dirname(configFile);
-    this._configFile = configFile;
-    this._config = {
-      account_endpoint: "https://account.rokid.com",
-      skill_endpoint: "https://developer.rokid.com",
-      rfs_endpoint: "https://developer-rfs.rokid.com",
-      prefix: "/skill",
-      user: {
-        username: "",
-        cookies: [],
-        skill: {},
-        rfs: {},
-        intents: {}
-      }
-    };
-    this.loadConfig();
-
+  public constructor() {
+    const cookies = ConfigStore.getCookies();
     this.$skillHttp = axios.create({
-      baseURL: this._config.skill_endpoint,
-      withCredentials: true,
+      baseURL: ConfigStore._config.skill_endpoint,
       headers: {
-        cookie: this._config.user.cookies.join("; ")
+        cookie: cookies
       }
     });
     this.$rfsHttp = axios.create({
-      baseURL: this._config.rfs_endpoint,
-      withCredentials: true,
+      baseURL: ConfigStore._config.rfs_endpoint,
       headers: {
-        cookie: this._config.user.cookies.join("; ")
+        cookie: cookies
       }
     });
   }
@@ -56,10 +35,12 @@ export class Agent {
         .digest("hex")
     };
     const response = await axios.post(
-      `${this._config.account_endpoint}/login.do`,
+      `${ConfigStore._config.account_endpoint}/login.do`,
       body
     );
-    this._config.user.username = username;
+    if (username !== null) {
+      ConfigStore._config.user.username = username;
+    }
     await this.execAfter(response);
     return response;
   }
@@ -69,18 +50,20 @@ export class Agent {
       "/skill/apps.do?page_num=1&page_size=20"
     );
     await this.execAfter(response);
-    return response.data;
+    return response;
   }
   public async listIntents(id: string | null) {
     const skill = await this.getSkillByAppId(id);
     const response = await this.$skillHttp.get(
-      `${this._config.skill_endpoint}/skill/domains/${id}/${skill.domainId}.do`
+      `${ConfigStore._config.skill_endpoint}/skill/domains/${id}/${
+        skill.data.domainId
+      }.do`
     );
-    return response.data;
+    return response;
   }
   public async getSkillByAppId(id: string | null) {
     const response = await this.$skillHttp.get(`/skill/apps/${id}.do`);
-    return response.data;
+    return response;
   }
   public async uploadIntents(
     id: string | null,
@@ -89,12 +72,14 @@ export class Agent {
   ) {
     const skill = await this.getSkillByAppId(id);
     await this.$skillHttp.post(
-      `/skill/domains/${id}/${skill.appDetailId}/${skill.domainId}/intents.do`,
+      `/skill/domains/${id}/${skill.data.appDetailId}/${
+        skill.data.domainId
+      }/intents.do`,
       intents
     );
 
     if (autoCompile) {
-      await this.compile(skill.domainId);
+      await this.compile(skill.data.domainId);
     }
     return skill;
   }
@@ -128,23 +113,35 @@ export class Agent {
         }
       }
     );
-    return response.data;
+    return response;
+  }
+  public async testNlp(appId: string | null, sentence: string | null) {
+    const response = await this.$skillHttp.get(
+      `/skill/integration-test/nlp.do`,
+      {
+        params: {
+          appId,
+          sentence
+        }
+      }
+    );
+    return response;
   }
   public async getServerInfo(appId: string | null) {
     const response = await this.$skillHttp.get(
       `/skill/apps/${appId}/server.do`
     );
-    return response.data;
+    return response;
   }
   public async getJsGroupId(appId: string | null) {
     await this.execBefore();
-    const data = await this.getServerInfo(appId);
+    const serverInfo = await this.getServerInfo(appId);
     await this.execAfter();
-    return data.jsGroupId; // ******-script-group
+    return serverInfo.data.jsGroupId; // ******-script-group
   }
   public async getBackService(appId: string | null) {
-    const data = await this.getServerInfo(appId);
-    return data.backService; // ******-script same with jsInfoId
+    const serverInfo = await this.getServerInfo(appId);
+    return serverInfo.data.backService; // ******-script same with jsInfoId
   }
   // RFS
   // @id string|null appId|jsGroupID
@@ -162,115 +159,56 @@ export class Agent {
       `/skill/js/${id}/groupEditInfo.do`
     );
     await this.execAfter();
-    return response.data;
+    return response;
   }
   // @id string|null BackServiceID|jsInfoID
   public async getTestCase(id: string | null) {
     const response = await this.$rfsHttp.get(
       `/skill/test/${id}/getTestCase.do`
     );
-    return response.data;
+    return response;
   }
+  // local method
   public async setDefaultSkill(skillInfo: any) {
     await this.execBefore();
-    this._config.user.skill = skillInfo;
 
-    const intents = await this.listIntents(skillInfo.appId);
-    const rfs = await this.getJsGroupInfo(skillInfo.appId);
+    const intentsResp = await this.listIntents(skillInfo.appId);
+    const intents = intentsResp.data;
+    const rfsResp = await this.getJsGroupInfo(skillInfo.appId);
+    const rfs = rfsResp.data;
     const testCase = await this.getTestCase(rfs.data.jsInfoVO.jsInfoId);
 
-    this._config.user.rfs = {
+    ConfigStore._config.skill = skillInfo;
+    ConfigStore._config.rfs = {
       jsGroupId: rfs.data.jsInfoVO.jsGroupId,
       jsInfoId: rfs.data.jsInfoVO.jsInfoId,
       jsTestCaseId: testCase.data.jsTestCaseId
     };
-    this._config.user.intents = intents;
+    ConfigStore._config.intents = intents;
 
     await this.execAfter();
   }
   // Helpers
-  private async execBefore() {
+  public async execBefore() {
+    ConfigStore.reload();
     this.init();
-    this.loadConfig();
   }
-  private async execAfter(response?: AxiosResponse) {
-    if (response) {
-      this.addCookie(response.headers["set-cookie"]);
-    }
-    this.saveConfig();
+  public async execAfter(response?: AxiosResponse) {
+    ConfigStore.procResponse(response);
   }
   private init() {
-    const cookies = this._config.user.cookies
-      ? this._config.user.cookies.join("; ")
-      : "";
+    const cookies = ConfigStore.getCookies();
     this.$skillHttp = axios.create({
-      baseURL: this._config.skill_endpoint,
+      baseURL: ConfigStore._config.skill_endpoint,
       headers: {
         cookie: cookies
       }
     });
     this.$rfsHttp = axios.create({
-      baseURL: this._config.rfs_endpoint,
+      baseURL: ConfigStore._config.rfs_endpoint,
       headers: {
-        cookie: this._config.user.cookies.join("; ")
+        cookie: cookies
       }
     });
-  }
-  private addCookie(items: any) {
-    var nullArray = function(arr: any) {
-      if (Array.isArray(arr)) {
-        if (arr.length === 0) {
-          return false;
-        }
-        return true;
-      }
-      return false;
-    };
-    var arrayUnique = function(arr: any) {
-      var result = [];
-      var l = arr.length;
-      if (nullArray(arr)) {
-        for (var i = 0; i < arr.length; i++) {
-          var temp = arr.slice(i + 1, l);
-          if (temp.indexOf(arr[i]) === -1) {
-            result.push(arr[i]);
-          } else {
-            continue;
-          }
-        }
-      }
-      return result;
-    };
-    this._config.user.cookies = this._config.user.cookies.concat(
-      items,
-      this._config.user.cookies
-    );
-    this._config.user.cookies = arrayUnique(this._config.user.cookies);
-    this.saveConfig();
-    this.init();
-  }
-  private ensureConfigDir() {
-    var exists = fs.existsSync(this._configPath);
-    if (!exists) {
-      fs.mkdirSync(this._configPath);
-    }
-    var profileExists = fs.existsSync(this._configFile);
-    if (!profileExists) {
-      fs.writeFileSync(this._configFile, "{}");
-    }
-  }
-  private saveConfig() {
-    fs.writeFileSync(
-      this._configFile,
-      JSON.stringify(this._config, null, "\t")
-    );
-  }
-  private loadConfig() {
-    this.ensureConfigDir();
-    // require is async, so use readFileSync
-    // var data = require(this._configFile);
-    var dataStr = fs.readFileSync(this._configFile, "utf-8");
-    var data = JSON.parse(dataStr);
-    this._config = Object.assign({}, this._config, data);
   }
 }
