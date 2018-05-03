@@ -4,7 +4,9 @@ import * as vscode from "vscode";
 import prompts from "../helper/prompts";
 import { BaseController } from "./baseController";
 import { ResponseStore } from "../helper/responseStore";
+import { ConfigStore } from "../helper/configStore";
 const fs = require("fs");
+const path = require("path");
 
 export class AgentController extends BaseController {
   public constructor() {
@@ -39,24 +41,32 @@ export class AgentController extends BaseController {
     this.quickPreviewResponse(previewUri);
   }
   public async uploadIntents() {
-    let curFilePath = "";
-    if (vscode.window.activeTextEditor !== undefined) {
-      curFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
+    this._agent.execBefore();
+    if (!this.statusLoginAndSetDefault()) {
+      return;
     }
-    const curFileContent = fs.readFileSync(curFilePath, "utf-8");
-
-    const id = await this.pickupSkillID();
+    const intentsFile = path.join(
+      vscode.workspace.rootPath,
+      ConfigStore._config.files.intents
+    );
+    const exists = fs.existsSync(intentsFile);
+    if (!exists) {
+      vscode.window.showErrorMessage("Intents file is not exist.");
+      return;
+    }
+    const curFileContent = fs.readFileSync(intentsFile, "utf-8");
+    const curFile = JSON.parse(curFileContent);
     const autoCompile = await prompts.pickup(
       ["No", "Yes"],
-      "Select your skill id"
+      "Do you want auto complie?"
     );
     await this._agent.uploadIntents(
-      id,
-      curFileContent,
+      ConfigStore._config.skill.appId,
+      curFile,
       autoCompile === "Yes" ? true : false
     );
-    vscode.window.showInformationMessage(curFileContent);
-    return curFileContent;
+    vscode.window.showInformationMessage(curFile);
+    return curFile;
   }
   public async compile() {
     const skill = await this.pickupSkill();

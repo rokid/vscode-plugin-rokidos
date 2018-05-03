@@ -16,6 +16,10 @@ export class ConfigStore {
     skill_endpoint: "https://developer.rokid.com",
     rfs_endpoint: "https://developer-rfs.rokid.com",
     sentences: new Array<string>(),
+    files: {
+      rfs: "dist/rfs.js",
+      intents: "src/intents.json"
+    },
     user: {
       username: "",
       cookies: new Array<string>()
@@ -64,7 +68,7 @@ export class ConfigStore {
               return pre;
             }, new Array<string>());
             if (curlSplit.length >= 2) {
-              cookieObj.set(curlSplit[0], curlSplit.slice(1, -1).join("="));
+              cookieObj.set(curlSplit[0], curlSplit.slice(1).join("="));
             }
           }
         });

@@ -70,18 +70,16 @@ export class Agent {
     intents: object,
     autoCompile: boolean
   ) {
-    const skill = await this.getSkillByAppId(id);
-    await this.$skillHttp.post(
-      `/skill/domains/${id}/${skill.data.appDetailId}/${
-        skill.data.domainId
-      }/intents.do`,
+    const skillResp = await this.getSkillByAppId(id);
+    const skill = skillResp.data;
+    const intentsUploadResp = await this.$skillHttp.post(
+      `/skill/domains/${id}/${skill.appDetailId}/${skill.domainId}/intents.do`,
       intents
     );
-
     if (autoCompile) {
-      await this.compile(skill.data.domainId);
+      await this.compile(skill.domainId);
     }
-    return skill;
+    return intentsUploadResp;
   }
   public async compile(domainId: string) {
     const spinner = ora("正在上传").start();
