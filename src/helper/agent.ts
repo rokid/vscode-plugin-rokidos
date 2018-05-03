@@ -166,15 +166,23 @@ export class Agent {
     );
     return response;
   }
+  public async saveTestCase(data: any) {
+    const response = await this.$rfsHttp.post(`/skill/test/save.do`, data);
+    return response;
+  }
   // local method
   public async setDefaultSkill(skillInfo: any) {
     await this.execBefore();
 
     const intentsResp = await this.listIntents(skillInfo.appId);
     const intents = intentsResp.data;
+
     const rfsResp = await this.getJsGroupInfo(skillInfo.appId);
     const rfs = rfsResp.data;
-    const testCase = await this.getTestCase(rfs.data.jsInfoVO.jsInfoId);
+
+    const testCaseResp = await this.getTestCase(rfs.data.jsInfoVO.jsInfoId);
+    const testCase = testCaseResp.data;
+    console.log(testCase);
 
     ConfigStore._config.skill = skillInfo;
     ConfigStore._config.rfs = {

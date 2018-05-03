@@ -62,7 +62,6 @@ export class DebugController extends BaseController {
       this.quickPreviewResponse(previewUri);
     }
   }
-  public async genRfsJson() {}
   // Just for playground
   public async sayRokidResponse() {
     return vscode.commands

@@ -20,6 +20,29 @@ export class ConfigStore {
       rfs: "dist/rfs.js",
       intents: "src/intents.json"
     },
+    test_case_skeleton: {
+      context: {
+        application: {
+          applicationId: ""
+        },
+        device: {
+          location: {},
+          media: {},
+          timestamp: 0
+        },
+        user: {}
+      },
+      request: {
+        content: {},
+        reqId: "",
+        reqType: "INTENT"
+      },
+      session: {
+        attributes: {},
+        newSession: true
+      },
+      version: "2.0.0"
+    },
     user: {
       username: "",
       cookies: new Array<string>()
@@ -27,7 +50,11 @@ export class ConfigStore {
     skill: {
       appId: ""
     },
-    rfs: {},
+    rfs: {
+      jsGroupId: "",
+      jsInfoId: "",
+      jsTestCaseId: ""
+    },
     intents: {}
   };
 

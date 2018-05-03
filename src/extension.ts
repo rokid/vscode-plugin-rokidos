@@ -4,6 +4,7 @@
 import * as vscode from "vscode";
 import { AgentController } from "./controllers/agentController";
 import { DebugController } from "./controllers/debugController";
+import { RfsController } from "./controllers/rfsController";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -16,33 +17,40 @@ export function activate(context: vscode.ExtensionContext) {
 
   let agentController = new AgentController();
   context.subscriptions.push(
-    vscode.commands.registerCommand("rokid.rfs.agent.login", () =>
+    vscode.commands.registerCommand("rokid.plugin.agent.login", () =>
       agentController.login()
     ),
-    vscode.commands.registerCommand("rokid.rfs.agent.setDefaultSkill", () =>
+    vscode.commands.registerCommand("rokid.plugin.agent.setDefaultSkill", () =>
       agentController.setDefaultSkill()
     ),
-    vscode.commands.registerCommand("rokid.rfs.agent.getSkillByAppId", () =>
+    vscode.commands.registerCommand("rokid.plugin.agent.getSkillByAppId", () =>
       agentController.getSkillByAppId()
     ),
-    vscode.commands.registerCommand("rokid.rfs.agent.uploadIntents", () =>
+    vscode.commands.registerCommand("rokid.plugin.agent.uploadIntents", () =>
       agentController.uploadIntents()
     ),
-    vscode.commands.registerCommand("rokid.rfs.agent.sayPathInfo", () =>
+    vscode.commands.registerCommand("rokid.plugin.agent.sayPathInfo", () =>
       agentController.sayPathInfo()
     )
   );
 
   let debugController = new DebugController();
   context.subscriptions.push(
-    vscode.commands.registerCommand("rokid.rfs.debug.testNlp", () =>
+    vscode.commands.registerCommand("rokid.plugin.debug.testNlp", () =>
       debugController.testNlp()
     ),
-    vscode.commands.registerCommand("rokid.rfs.debug.testIntents", () =>
+    vscode.commands.registerCommand("rokid.plugin.debug.testIntents", () =>
       debugController.testIntents()
     ),
-    vscode.commands.registerCommand("rokid.rfs.debug.sayRokidResponse", () =>
+    vscode.commands.registerCommand("rokid.plugin.debug.sayRokidResponse", () =>
       debugController.sayRokidResponse()
+    )
+  );
+
+  let rfsController = new RfsController();
+  context.subscriptions.push(
+    vscode.commands.registerCommand("rokid.plugin.rfs.saveTestCase", () =>
+      rfsController.saveTestCase()
     )
   );
 }

@@ -9,45 +9,51 @@
   },
   "categories": ["Other"],
   "activationEvents": [
-    "onCommand:rokid.rfs.agent.login",
-    "onCommand:rokid.rfs.agent.setDefaultSkill",
-    "onCommand:rokid.rfs.agent.getSkillByAppId",
-    "onCommand:rokid.rfs.agent.uploadIntents",
-    "onCommand:rokid.rfs.debug.testIntents",
-    "onCommand:rokid.rfs.debug.testNlp"
+    "onCommand:rokid.plugin.agent.login",
+    "onCommand:rokid.plugin.agent.setDefaultSkill",
+    "onCommand:rokid.plugin.agent.getSkillByAppId",
+    "onCommand:rokid.plugin.agent.uploadIntents",
+    "onCommand:rokid.plugin.debug.testIntents",
+    "onCommand:rokid.plugin.debug.testNlp",
+    "onCommand:rokid.plugin.rfs.saveTestCase"
   ],
   "main": "./out/extension",
   "contributes": {
     "commands": [
       {
-        "command": "rokid.rfs.agent.login",
+        "command": "rokid.plugin.agent.login",
         "title": "Login",
         "category": "Rokid"
       },
       {
-        "command": "rokid.rfs.agent.setDefaultSkill",
+        "command": "rokid.plugin.agent.setDefaultSkill",
         "title": "Set Default Skill",
         "category": "Rokid"
       },
       {
-        "command": "rokid.rfs.agent.getSkillByAppId",
+        "command": "rokid.plugin.agent.getSkillByAppId",
         "title": "Get Skill By App ID",
         "category": "Rokid"
       },
       {
-        "command": "rokid.rfs.agent.uploadIntents",
+        "command": "rokid.plugin.agent.uploadIntents",
         "title": "Upload Intents",
         "category": "Rokid"
       },
       {
-        "command": "rokid.rfs.debug.testIntents",
+        "command": "rokid.plugin.debug.testIntents",
         "title": "Test Intents",
         "category": "Rokid Debug"
       },
       {
-        "command": "rokid.rfs.debug.testNlp",
+        "command": "rokid.plugin.debug.testNlp",
         "title": "Test NLP",
         "category": "Rokid Debug"
+      },
+      {
+        "command": "rokid.plugin.rfs.saveTestCase",
+        "title": "Save Test Case",
+        "category": "Rokid RFS"
       }
     ]
   },
