@@ -2,7 +2,7 @@
   "name": "vscode-plugin-rokidos",
   "displayName": "RokidOS Extension",
   "description": "RokidOS Extension for Visual Studio Code",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "xqbumu",
   "author": {
     "name": "xqbumu",
