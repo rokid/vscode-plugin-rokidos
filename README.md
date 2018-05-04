@@ -12,6 +12,10 @@ VS Code Plugin RokidOS allows you to develop Rokid Cloud Skill easily, and it co
 * Test NLP
 * Save test case
 
+### Demo
+
+![Demo](images/demo.gif)
+
 ## Extension Settings
 
 You can change the default settings through the `.vscode/rokid.setting.json` file, and the file is generated when you run the plugin first.
