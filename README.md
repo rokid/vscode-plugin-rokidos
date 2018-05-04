@@ -41,4 +41,11 @@ See CHANGELOG [here](CHANGELOG.md)
 
 * [Rokid docs](http://developer.rokid.com/docs)
 
+## Publish
+
+```sh
+npm install -g vsce
+vsce package
+```
+
 **Enjoy!**

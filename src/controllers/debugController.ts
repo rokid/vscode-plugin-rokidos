@@ -51,12 +51,14 @@ export class DebugController extends BaseController {
         sentence
       );
       const nlp = nlpResp.data;
+      console.log(nlp);
       let previewUri = this.generatePreviewUri();
       ResponseStore.add(previewUri.toString(), {
         resp: nlpResp,
         data: {
           request: JSON.parse(nlp["request"]),
-          response: JSON.parse(nlp["response"])
+          response: JSON.parse(nlp["response"]),
+          logs: nlp["jsDebugLogs"]
         }
       });
       this.quickPreviewResponse(previewUri);
