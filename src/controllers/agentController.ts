@@ -13,7 +13,7 @@ export class AgentController extends BaseController {
     super();
   }
   public async login() {
-    let username = await prompts.string("Enter your usernmae");
+    let username = await prompts.string("Enter your username");
     let password = await prompts.password("Enter your password");
     let status = null;
     if (username && password) {
@@ -51,7 +51,7 @@ export class AgentController extends BaseController {
     );
     const exists = fs.existsSync(intentsFile);
     if (!exists) {
-      vscode.window.showErrorMessage("Intents file is not exist.");
+      vscode.window.showErrorMessage("Intents file does not exist.");
       return;
     }
     const curFileContent = fs.readFileSync(intentsFile, "utf-8");
@@ -60,13 +60,14 @@ export class AgentController extends BaseController {
       ["No", "Yes"],
       "Do you want auto complie?"
     );
-    await this._agent.uploadIntents(
+    const intentsUploadResp = await this._agent.uploadIntents(
       ConfigStore._config.skill.appId,
       curFile,
       autoCompile === "Yes" ? true : false
     );
-    vscode.window.showInformationMessage(curFile);
-    return curFile;
+    vscode.window.showInformationMessage(
+      intentsUploadResp.status === 201 ? "Success" : "Failure"
+    );
   }
   public async compile() {
     const skill = await this.pickupSkill();
